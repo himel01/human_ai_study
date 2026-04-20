@@ -125,7 +125,7 @@ export default function App() {
     <div className="app-shell">
       <header className="topbar">
         <div>
-          <h1>AI Coding Study</h1>
+          <h1>Human AI Study</h1>
           <p className="muted">
             Complete the task, use the integrated AI assistant, then continue to
             the survey.
