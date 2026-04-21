@@ -128,7 +128,7 @@ export default function App() {
           <h1>Human AI Study</h1>
           <p className="muted">
             Complete the task, use the integrated AI assistant, then continue to
-            the survey.
+            the survey
           </p>
         </div>
         <div className="meta">
