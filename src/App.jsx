@@ -27,11 +27,7 @@ export default function App() {
   const [prompt, setPrompt] = useState('')
   const [messages, setMessages] = useState([])
   const [code, setCode] = useState(
-    `def auth_system(actions: list[dict]) -> list[dict]:
-    users = {}
-    current_user = None
-    results = []
-    return results`,
+    `Enter your final code implementation here before finishing the task...`,
   )
   const [loading, setLoading] = useState(false)
   const [completed, setCompleted] = useState(false)
