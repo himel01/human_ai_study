@@ -29,7 +29,8 @@ export default function App() {
   const [code, setCode] = useState(
     `Enter your final code implementation here before finishing the task...`,
   )
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false) // for chat
+  const [finishing, setFinishing] = useState(false) // for finish task
   const [completed, setCompleted] = useState(false)
   const [error, setError] = useState('')
   const [firstPromptSent, setFirstPromptSent] = useState(false)
@@ -98,7 +99,10 @@ export default function App() {
   }
 
   async function finishTask() {
+    if (!code.trim()) return // extra guard on top of disabled button
+
     setError('')
+    setFinishing(true)
     try {
       const res = await fetch('/.netlify/functions/complete', {
         method: 'POST',
@@ -116,6 +120,8 @@ export default function App() {
       setCompleted(true)
     } catch (e) {
       setError(e.message)
+    } finally {
+      setFinishing(false)
     }
   }
 
@@ -130,11 +136,13 @@ export default function App() {
   const canContinueFromPrep =
     condition !== 'A' || explanation.trim().length >= 30
 
+  const canFinish = code.trim().length > 0
+
   return (
     <div className="app-shell">
       <header className="topbar">
         <div>
-          <h1>Human-AI Study</h1>
+          <h1>AI Coding Study</h1>
           <p className="muted">
             Complete the task, use the integrated AI assistant, then continue to
             the survey.
@@ -480,15 +488,25 @@ export default function App() {
                 className="code-area"
               />
               <div className="actions">
-                <button onClick={finishTask} className="primary">
-                  Finish task
+                <button
+                  onClick={finishTask}
+                  className="primary"
+                  disabled={!canFinish || finishing}
+                >
+                  {finishing ? 'Finishing...' : 'Finish task'}
                 </button>
-                {completed && (
+                {completed && !finishing && (
                   <a className="secondary" href={surveyLink}>
                     Continue to Webropol survey
                   </a>
                 )}
               </div>
+              {!canFinish && (
+                <p className="muted">
+                  Please write or paste your solution code before finishing the
+                  task.
+                </p>
+              )}
               {error && <p className="error">{error}</p>}
             </div>
           </section>
