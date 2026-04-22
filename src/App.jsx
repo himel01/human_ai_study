@@ -26,11 +26,10 @@ export default function App() {
   const [explanation, setExplanation] = useState('')
   const [prompt, setPrompt] = useState('')
   const [messages, setMessages] = useState([])
-  const [code, setCode] = useState(
-    `Enter your final code implementation here before finishing the task...`,
-  )
-  const [loading, setLoading] = useState(false) // for chat
-  const [finishing, setFinishing] = useState(false) // for finish task
+  // Start with EMPTY code so Finish is disabled until they type something
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false) // chat loading
+  const [finishing, setFinishing] = useState(false) // finish-task loading
   const [completed, setCompleted] = useState(false)
   const [error, setError] = useState('')
   const [firstPromptSent, setFirstPromptSent] = useState(false)
@@ -99,7 +98,7 @@ export default function App() {
   }
 
   async function finishTask() {
-    if (!code.trim()) return // extra guard on top of disabled button
+    if (!code.trim()) return // guard
 
     setError('')
     setFinishing(true)
@@ -486,6 +485,7 @@ export default function App() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 className="code-area"
+                placeholder="Write or paste your Python solution for auth_system here..."
               />
               <div className="actions">
                 <button
