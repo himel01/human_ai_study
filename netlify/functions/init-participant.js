@@ -23,7 +23,7 @@ export async function handler(event) {
     const supabase = getSupabase()
     const { error } = await supabase
       .from('participants')
-      .upsert(
+      .insert(
         {
           prolific_pid: pid,
           study_id: studyId,
