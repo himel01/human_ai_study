@@ -36,9 +36,9 @@ export default function App() {
 
   const conditionText = useMemo(() => {
     if (condition === 'A') {
-      return 'Condition A: You first write down your own understanding of the task. That exact text is used as your first prompt to the AI.'
+      return 'Condition A: First write down your own understanding of the task, use it as your first prompt to the AI then refine from there if needed. Test your solution in jupyter lab. Paste your final code in the box on the left when done.'
     }
-    return 'Condition B: For your first prompt, use the task description directly to ask the AI for code help, without first writing out your own detailed understanding.'
+    return 'Condition B: For your first prompt, use the task description directly to ask the AI for code help, without first writing out your own detailed understanding. Then refine your prompts as needed. Test your solution in jupyter lab. Paste your final code in the box on the left when done.'
   }, [condition])
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function App() {
         <div>
           <h1>AI Coding Study</h1>
           <p className="muted">
-            Complete the task, use the integrated AI assistant, then continue to
+            Use the integrated AI assistant, complete the task, then continue to
             the survey.
           </p>
         </div>
@@ -244,39 +244,7 @@ export default function App() {
 }`}
                 </pre>
 
-                <h4>Rules</h4>
-                <h5>Registration Rules</h5>
-                <p>
-                  Registration should be reasonably secure by checking for:
-                </p>
-                <ul>
-                  <li>Appropriate usernames</li>
-                  <li>Strong enough passwords</li>
-                  <li>Valid-looking emails</li>
-                </ul>
-                <p>
-                  Failed registrations should return an error with a reason you
-                  define.
-                </p>
-
-                <h5>Login Rules</h5>
-                <ul>
-                  <li>
-                    Login succeeds when credentials are correct according to
-                    your validation.
-                  </li>
-                  <li>Login fails when credentials are incorrect.</li>
-                </ul>
-                <p>
-                  Note: Successful login sets that user as the current logged-in
-                  user.
-                </p>
-
-                <h5>Profile Rules</h5>
-                <p>
-                  Return current logged-in user's profile or <code>None</code> if
-                  no one is logged in.
-                </p>
+                
 
                 <h4>Response Format</h4>
                 <p>Successful Register/Login:</p>
@@ -405,40 +373,6 @@ export default function App() {
 }`}
                 </pre>
 
-                <h4>Rules</h4>
-                <h5>Registration Rules</h5>
-                <p>
-                  Registration should be reasonably secure by checking for:
-                </p>
-                <ul>
-                  <li>Appropriate usernames</li>
-                  <li>Strong enough passwords</li>
-                  <li>Valid-looking emails</li>
-                </ul>
-                <p>
-                  Failed registrations should return an error with a reason you
-                  define.
-                </p>
-
-                <h5>Login Rules</h5>
-                <ul>
-                  <li>
-                    Login succeeds when credentials are correct according to
-                    your validation.
-                  </li>
-                  <li>Login fails when credentials are incorrect.</li>
-                </ul>
-                <p>
-                  Note: Successful login sets that user as the current logged-in
-                  user.
-                </p>
-
-                <h5>Profile Rules</h5>
-                <p>
-                  Return current logged-in user's profile or <code>None</code> if
-                  no one is logged in.
-                </p>
-
                 <h4>Response Format</h4>
                 <p>Successful Register/Login:</p>
                 <pre>
@@ -480,12 +414,12 @@ export default function App() {
             </div>
 
             <div className="card">
-              <h2>Your code</h2>
+              <h2>Final Answer</h2>
               <textarea
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 className="code-area"
-                placeholder="Write or paste your Python solution for auth_system here..."
+                placeholder="Paste your Python solution for auth_system here..."
               />
               <div className="actions">
                 <button
@@ -503,7 +437,7 @@ export default function App() {
               </div>
               {!canFinish && (
                 <p className="muted">
-                  Please write or paste your solution code before finishing the
+                  Paste your solution code before finishing the
                   task.
                 </p>
               )}
@@ -517,18 +451,13 @@ export default function App() {
 
               {condition === 'A' && !firstPromptSent && (
                 <p className="muted" style={{ marginBottom: '8px' }}>
-                  The text in the box below is exactly what you wrote on the
-                  previous screen. You can send it as your first message to the
-                  AI, or edit it before sending.
+                  
                 </p>
               )}
 
               {condition === 'B' && !firstPromptSent && (
                 <p className="muted" style={{ marginBottom: '8px' }}>
-                  For your first prompt, please use the task description
-                  directly to ask the AI for code help, without adding a long
-                  explanation of your own understanding first. You may refine
-                  prompts later.
+                  
                 </p>
               )}
 
@@ -552,8 +481,8 @@ export default function App() {
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder={
                     condition === 'A' && !firstPromptSent
-                      ? 'Your explanation is pre-filled. You can edit it or press Send.'
-                      : 'Type your next prompt here...'
+                      ? 'Type your prompt here...'
+                      : 'Type your prompt here...'
                   }
                 />
                 <button
