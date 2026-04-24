@@ -31,7 +31,7 @@ export async function handler(event) {
           condition,
           created_at: new Date().toISOString(),
         },
-        { onConflict: 'prolific_pid' },
+        //{ onConflict: 'prolific_pid' },
       )
 
     if (error) return json(500, { error: error.message })
