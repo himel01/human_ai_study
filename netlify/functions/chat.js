@@ -1,4 +1,9 @@
+import OpenAI from 'openai'
 import { getSupabase } from './_supabase.js'
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 function json(statusCode, body) {
   return {
@@ -18,60 +23,68 @@ export async function handler(event) {
       event.body || '{}',
     )
 
-    if (!pid || !prompt) {
-      return json(400, { error: 'Missing pid or prompt' })
+    if (!pid) return json(400, { error: 'Missing PROLIFIC_PID' })
+    if (!prompt || !prompt.trim()) {
+      return json(400, { error: 'Missing prompt' })
     }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return json(500, { error: 'OPENAI_API_KEY not configured' })
-    }
-
-    const openaiRes = await fetch(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You are a helpful Python coding assistant helping a participant solve a small programming task. Give concise, practical help.',
-            },
-            { role: 'user', content: prompt },
-          ],
-          temperature: 0.4,
-        }),
-      },
-    )
-
-    const openaiData = await openaiRes.json()
-
-    if (!openaiRes.ok) {
-      const message =
-        openaiData?.error?.message || 'OpenAI API returned an error'
-      return json(502, { error: message })
-    }
-
-    const reply =
-      openaiData.choices?.[0]?.message?.content || 'No response returned.'
 
     const supabase = getSupabase()
-    const { error } = await supabase.from('ai_logs').insert({
-      prolific_pid: pid,
-      study_id: studyId,
-      session_id: sessionId,
-      condition,
-      prompt,
-      response: reply,
-      created_at: new Date().toISOString(),
-    })
 
-    if (error) return json(500, { error: error.message })
+    const { data: existingState, error: stateFetchError } = await supabase
+      .from('chat_state')
+      .select('id, last_response_id')
+      .eq('prolific_pid', pid)
+      .eq('session_id', sessionId)
+      .maybeSingle()
+
+    if (stateFetchError) {
+      return json(500, { error: stateFetchError.message })
+    }
+
+    const requestBody = {
+      model: 'gpt-4o-mini',
+      input: prompt,
+      store: true,
+      //instructions:'You are a helpful programming assistant. Continue the same conversation naturally. Be concise but useful.',
+    }
+
+    if (existingState?.last_response_id) {
+      requestBody.previous_response_id = existingState.last_response_id
+    }
+
+    const response = await client.responses.create(requestBody)
+
+    const reply = response.output_text || ''
+    const newResponseId = response.id
+
+    if (existingState?.id) {
+      const { error: updateError } = await supabase
+        .from('chat_state')
+        .update({
+          last_response_id: newResponseId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingState.id)
+
+      if (updateError) {
+        return json(500, { error: updateError.message })
+      }
+    } else {
+      const { error: insertError } = await supabase
+        .from('chat_state')
+        .insert({
+          prolific_pid: pid,
+          study_id: studyId,
+          session_id: sessionId,
+          condition,
+          last_response_id: newResponseId,
+          updated_at: new Date().toISOString(),
+        })
+
+      if (insertError) {
+        return json(500, { error: insertError.message })
+      }
+    }
 
     return json(200, { reply })
   } catch (e) {
