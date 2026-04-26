@@ -45,7 +45,6 @@ export async function handler(event) {
       model: 'gpt-4o-mini',
       input: prompt,
       store: true,
-      //instructions:'You are a helpful programming assistant. Continue the same conversation naturally. Be concise but useful.',
     }
 
     if (existingState?.last_response_id) {
@@ -70,7 +69,7 @@ export async function handler(event) {
         return json(500, { error: updateError.message })
       }
     } else {
-      const { error: insertError } = await supabase
+      const { error: insertStateError } = await supabase
         .from('chat_state')
         .insert({
           prolific_pid: pid,
@@ -78,12 +77,30 @@ export async function handler(event) {
           session_id: sessionId,
           condition,
           last_response_id: newResponseId,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
 
-      if (insertError) {
-        return json(500, { error: insertError.message })
+      if (insertStateError) {
+        return json(500, { error: insertStateError.message })
       }
+    }
+
+    const { error: logError } = await supabase
+      .from('ai_logs')
+      .insert({
+        prolific_pid: pid,
+        study_id: studyId,
+        session_id: sessionId,
+        condition,
+        user_prompt: prompt,
+        ai_reply: reply,
+        response_id: newResponseId,
+        created_at: new Date().toISOString(),
+      })
+
+    if (logError) {
+      return json(500, { error: logError.message })
     }
 
     return json(200, { reply })
