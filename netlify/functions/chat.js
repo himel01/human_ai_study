@@ -93,7 +93,7 @@ export async function handler(event) {
         study_id: studyId,
         session_id: sessionId,
         condition,
-        user_prompt: prompt,
+        prompt: prompt,
         response: reply,
         response_id: newResponseId,
         created_at: new Date().toISOString(),
