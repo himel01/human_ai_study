@@ -94,7 +94,7 @@ export async function handler(event) {
         session_id: sessionId,
         condition,
         user_prompt: prompt,
-        ai_reply: reply,
+        response: reply,
         response_id: newResponseId,
         created_at: new Date().toISOString(),
       })
